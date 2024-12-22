@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* RGB Light Gradient Background */
+        body {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.6), rgba(0, 255, 255, 0.6), rgba(0, 0, 255, 0.6));
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
+            font-family: 'Arial', sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .cell {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+        }
+
+        .cell.winning-cell {
+            background-color: rgba(76, 175, 80, 0.8) !important;
+            color: white !important;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 330px;
+            max-height: 330px;
+            margin-bottom: 30px;
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.3s;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        .message {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: white;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.6);
+            width: 80%;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Add FadeIn Animation for Message */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .reset-btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 30px; /* Adds space at the bottom */
+        }
+
+        .reset-btn:hover {
+            background-color: #45a049;
+        }
+
+        .scoreboard {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .toggle-theme-btn {
+            padding: 12px 24px;
+            background-color: #009688;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-theme-btn:hover {
+            background-color: #00796b;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .board {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+                gap: 8px;
+            }
+
+            .cell {
+                font-size: 1.5rem;
+                height: 80px;
+                width: 80px;
+            }
+
+            .reset-btn,
+            .toggle-theme-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="scoreboard" id="scoreboard">Player X: 0 | Player O: 0 | Draws: 0</div>
+    <div class="message" id="message">Player X's turn</div>
+    <div class="board" id="board"></div>
+    <button class="reset-btn" id="resetButton">Restart Game</button>
+    <button class="toggle-theme-btn" id="toggleThemeButton">Toggle Dark/Light Theme</button>
+</div>
+
+<script>
+let board = ['', '', '', '', '', '', '', '', '']; // 3x3 grid
+let currentPlayer = 'X'; // Start with player X
+let gameOver = false;
+let scoreX = 0;
+let scoreO = 0;
+let draws = 0;
+let winningCombination = [];
+
+const winPatterns = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],  // Rows
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],  // Columns
+    [0, 4, 8], [2, 4, 6]              // Diagonals
+];
+
+// Check for winner
+function checkWinner(board) {
+    for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            winningCombination = pattern;
+            return board[a];
+        }
+    }
+    return null;
+}
+
+// Render board
+function renderBoard() {
+    const boardElement = document.getElementById('board');
+    boardElement.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.textContent = board[i];
+        if (winningCombination.includes(i)) {
+            cell.classList.add('winning-cell');
+        }
+        cell.addEventListener('click', () => handleClick(i));
+        boardElement.appendChild(cell);
+    }
+}
+
+// Handle player click
+function handleClick(index) {
+    if (gameOver || board[index] !== '') return;
+
+    board[index] = currentPlayer;
+    renderBoard();
+    const winner = checkWinner(board);
+    if (winner) {
+        gameOver = true;
+        updateScore(winner);
+        displayMessage(winner);
+        return;
+    }
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    displayMessage(`Player ${currentPlayer}'s turn`);
+}
+
+// Display the winner
+function displayMessage(winner) {
+    const messageElement = document.getElementById('message');
+    if (winner === 'X') {
+        messageElement.textContent = 'Player X wins!';
+        messageElement.style.backgroundColor = '#4CAF50';
+    } else if (winner === 'O') {
+        messageElement.textContent = 'Player O wins!';
+        messageElement.style.backgroundColor = '#FF5722';
+    } else {
+        messageElement.textContent = 'It\'s a draw!';
+        messageElement.style.backgroundColor = '#FF9800';
+    }
+}
+
+// Update the score
+function updateScore(winner) {
+    if (winner === 'X') {
+        scoreX++;
+    } else if (winner === 'O') {
+        scoreO++;
+    } else {
+        draws++;
+    }
+    document.getElementById('scoreboard').textContent = `Player X: ${scoreX} | Player O: ${scoreO} | Draws: ${draws}`;
+}
+
+// Reset the game
+document.getElementById('resetButton').addEventListener('click', () => {
+    board = ['', '', '', '', '', '', '', '', ''];
+    currentPlayer = 'X';
+    gameOver = false;
+    winningCombination = [];
+    document.getElementById('message').textContent = 'Player X\'s turn';
+    document.getElementById('message').style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+    renderBoard();
+});
+
+// Toggle Dark/Light Theme
+document.getElementById('toggleThemeButton').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});
+
+// Initial game render
+renderBoard();
+</script>
+
+</body>
+</html>
