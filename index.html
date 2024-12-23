@@ -3,268 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe Game</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Chemistry Tube Water Sort Puzzle</title>
     <style>
-        /* RGB Light Gradient Background */
         body {
-            background: linear-gradient(135deg, rgba(255, 0, 0, 0.6), rgba(0, 255, 255, 0.6), rgba(0, 0, 255, 0.6));
-            background-size: 400% 400%;
-            animation: gradientBG 8s ease infinite;
             font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #ffefd5, #ffe4b5);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
-        @keyframes gradientBG {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
-        }
-
-        .cell {
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .cell:hover {
-            transform: scale(1.05);
-        }
-
-        .cell.winning-cell {
-            background-color: rgba(76, 175, 80, 0.8) !important;
-            color: white !important;
+        h1 {
+            margin: 10px 0;
+            font-size: 26px;
+            color: #4caf50;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
 
         .game-container {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
+            gap: 20px;
+            max-width: 90%;
             margin: 20px 0;
-            max-width: 330px;
-            max-height: 330px;
-            margin-bottom: 30px;
         }
 
-        .cell {
+        .test-tube {
+            position: relative;
+            width: 10vw;
+            max-width: 60px;
+            height: 40vw;
+            max-height: 200px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            font-weight: bold;
+            flex-direction: column-reverse;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(240, 240, 240, 0.5));
+            border: 2px solid rgba(200, 200, 200, 0.7);
+            border-radius: 50% 50% 5px 5px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .test-tube:hover {
+            transform: scale(1.1);
+        }
+
+        .layer {
+            height: 25%;
+            width: 100%;
+            border-radius: 0 0 3px 3px;
+            transition: all 0.5s ease;
+        }
+
+        .color-red {
+            background: linear-gradient(to bottom, #f44336, #d32f2f);
+        }
+
+        .color-blue {
+            background: linear-gradient(to bottom, #2196f3, #1976d2);
+        }
+
+        .color-green {
+            background: linear-gradient(to bottom, #4caf50, #388e3c);
+        }
+
+        .color-yellow {
+            background: linear-gradient(to bottom, #ffeb3b, #fbc02d);
+        }
+
+        .color-purple {
+            background: linear-gradient(to bottom, #9c27b0, #7b1fa2);
+        }
+
+        .color-orange {
+            background: linear-gradient(to bottom, #ff9800, #f57c00);
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .level-info {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #37474f;
+        }
+
+        .win-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
             border-radius: 10px;
-            background-color: #ffffff;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: none;
+            z-index: 1000;
         }
 
-        .cell:active {
-            transform: scale(0.95);
-        }
-
-        .message {
-            font-size: 1.5rem;
-            margin-top: 20px;
-            color: white;
-            font-weight: bold;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.6);
-            width: 80%;
+        .win-popup h2 {
             margin-bottom: 20px;
-            animation: fadeIn 1s ease-in-out;
         }
 
-        /* Add FadeIn Animation for Message */
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        .reset-btn {
-            padding: 12px 24px;
-            font-size: 1.1rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 30px; /* Adds space at the bottom */
-        }
-
-        .reset-btn:hover {
-            background-color: #45a049;
-        }
-
-        .scoreboard {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .toggle-theme-btn {
-            padding: 12px 24px;
-            background-color: #009688;
-            color: white;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .toggle-theme-btn:hover {
-            background-color: #00796b;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 600px) {
-            .board {
-                grid-template-columns: repeat(3, 80px);
-                grid-template-rows: repeat(3, 80px);
-                gap: 8px;
+        @media (max-width: 768px) {
+            .test-tube {
+                width: 15vw;
+                height: 45vw;
             }
 
-            .cell {
-                font-size: 1.5rem;
-                height: 80px;
-                width: 80px;
-            }
-
-            .reset-btn,
-            .toggle-theme-btn {
-                font-size: 1rem;
-                padding: 10px 20px;
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
             }
         }
     </style>
 </head>
 <body>
+    <h1>Water Sort Puzzle</h1>
+    <div class="level-info" id="levelInfo">Level: 1</div>
+    <div class="game-container" id="gameContainer"></div>
+    <div class="controls">
+        <button onclick="resetGame()">Reset</button>
+    </div>
 
-<div class="game-container">
-    <div class="scoreboard" id="scoreboard">Player X: 0 | Player O: 0 | Draws: 0</div>
-    <div class="message" id="message">Player X's turn</div>
-    <div class="board" id="board"></div>
-    <button class="reset-btn" id="resetButton">Restart Game</button>
-    <button class="toggle-theme-btn" id="toggleThemeButton">Toggle Dark/Light Theme</button>
-</div>
+    <div class="win-popup" id="winPopup">
+        <h2>🎉 Congratulations! You Win!</h2>
+        <button onclick="nextLevel()">Next Level</button>
+    </div>
 
-<script>
-let board = ['', '', '', '', '', '', '', '', '']; // 3x3 grid
-let currentPlayer = 'X'; // Start with player X
-let gameOver = false;
-let scoreX = 0;
-let scoreO = 0;
-let draws = 0;
-let winningCombination = [];
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
 
-const winPatterns = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],  // Rows
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],  // Columns
-    [0, 4, 8], [2, 4, 6]              // Diagonals
-];
+    <script>
+        const COLORS = ["red", "blue", "green", "yellow", "purple", "orange"];
+        let level = 1;
+        let tubes = [];
+        let selectedTube = null;
 
-// Check for winner
-function checkWinner(board) {
-    for (const pattern of winPatterns) {
-        const [a, b, c] = pattern;
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            winningCombination = pattern;
-            return board[a];
+        function initGame() {
+            tubes = generateLevel(level);
+            renderGame();
+            updateLevelInfo();
+            playMusic();
         }
-    }
-    return null;
-}
 
-// Render board
-function renderBoard() {
-    const boardElement = document.getElementById('board');
-    boardElement.innerHTML = '';
-    for (let i = 0; i < 9; i++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        cell.textContent = board[i];
-        if (winningCombination.includes(i)) {
-            cell.classList.add('winning-cell');
+        function generateLevel(level) {
+            const numColors = Math.min(3 + Math.floor(level / 5), COLORS.length);
+            const numTubes = numColors + Math.max(2 - Math.floor(level / 50), 1);
+            const colors = COLORS.slice(0, numColors);
+            const shuffledColors = shuffle([...colors, ...colors, ...colors]);
+
+            const generatedTubes = [];
+            for (let i = 0; i < numTubes - 2; i++) {
+                const tubeColors = shuffledColors.splice(0, 4);
+                generatedTubes.push(tubeColors);
+            }
+            generatedTubes.push([]);
+            generatedTubes.push([]);
+            return generatedTubes;
         }
-        cell.addEventListener('click', () => handleClick(i));
-        boardElement.appendChild(cell);
-    }
-}
 
-// Handle player click
-function handleClick(index) {
-    if (gameOver || board[index] !== '') return;
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-    board[index] = currentPlayer;
-    renderBoard();
-    const winner = checkWinner(board);
-    if (winner) {
-        gameOver = true;
-        updateScore(winner);
-        displayMessage(winner);
-        return;
-    }
+        function renderGame() {
+            const gameContainer = document.getElementById("gameContainer");
+            gameContainer.innerHTML = "";
 
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    displayMessage(`Player ${currentPlayer}'s turn`);
-}
+            tubes.forEach((tube, index) => {
+                const testTube = document.createElement("div");
+                testTube.className = "test-tube";
+                testTube.addEventListener("click", () => handleTubeClick(index));
 
-// Display the winner
-function displayMessage(winner) {
-    const messageElement = document.getElementById('message');
-    if (winner === 'X') {
-        messageElement.textContent = 'Player X wins!';
-        messageElement.style.backgroundColor = '#4CAF50';
-    } else if (winner === 'O') {
-        messageElement.textContent = 'Player O wins!';
-        messageElement.style.backgroundColor = '#FF5722';
-    } else {
-        messageElement.textContent = 'It\'s a draw!';
-        messageElement.style.backgroundColor = '#FF9800';
-    }
-}
+                tube.forEach(color => {
+                    const layer = document.createElement("div");
+                    layer.className = `layer color-${color}`;
+                    testTube.appendChild(layer);
+                });
 
-// Update the score
-function updateScore(winner) {
-    if (winner === 'X') {
-        scoreX++;
-    } else if (winner === 'O') {
-        scoreO++;
-    } else {
-        draws++;
-    }
-    document.getElementById('scoreboard').textContent = `Player X: ${scoreX} | Player O: ${scoreO} | Draws: ${draws}`;
-}
+                gameContainer.appendChild(testTube);
+            });
+        }
 
-// Reset the game
-document.getElementById('resetButton').addEventListener('click', () => {
-    board = ['', '', '', '', '', '', '', '', ''];
-    currentPlayer = 'X';
-    gameOver = false;
-    winningCombination = [];
-    document.getElementById('message').textContent = 'Player X\'s turn';
-    document.getElementById('message').style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
-    renderBoard();
-});
+        function handleTubeClick(index) {
+            if (selectedTube === null) {
+                selectedTube = index;
+            } else {
+                if (selectedTube !== index) {
+                    transferWater(selectedTube, index);
+                }
+                selectedTube = null;
+            }
+            renderGame();
+            checkWin();
+        }
 
-// Toggle Dark/Light Theme
-document.getElementById('toggleThemeButton').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-});
+        function transferWater(from, to) {
+            while (
+                tubes[from].length > 0 &&
+                (tubes[to].length === 0 ||
+                    tubes[from][tubes[from].length - 1] === tubes[to][tubes[to].length - 1]) &&
+                tubes[to].length < 4
+            ) {
+                tubes[to].push(tubes[from].pop());
+            }
+        }
 
-// Initial game render
-renderBoard();
-</script>
+        function checkWin() {
+            const isWin = tubes.every(tube => tube.length === 0 || new Set(tube).size === 1);
+            if (isWin) {
+                showWinPopup();
+            }
+        }
 
+        function showWinPopup() {
+            document.getElementById("winPopup").style.display = "block";
+        }
+
+        function nextLevel() {
+            document.getElementById("winPopup").style.display = "none";
+            level++;
+            initGame();
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        function updateLevelInfo() {
+            document.getElementById("levelInfo").textContent = `Level: ${level}`;
+        }
+
+        function playMusic() {
+            const music = document.getElementById("backgroundMusic");
+            music.play();
+        }
+
+        initGame();
+    </script>
 </body>
 </html>
